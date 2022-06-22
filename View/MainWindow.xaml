@@ -1,0 +1,205 @@
+﻿<Window x:Class="Winamp.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:Winamp"
+        mc:Ignorable="d"
+        Title="Super player" Height="800" Width="380"
+        MinHeight="500" MinWidth="350" WindowStartupLocation="CenterScreen" 
+        Background="#FF070900">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding CloseCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Window.Resources>
+
+        <Style x:Key="TitleStyle" TargetType="Label">
+            <Style.Setters>
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Foreground" Value="#FFA1F500" />
+            </Style.Setters>
+        </Style>
+
+        <Style x:Key="TimeStyle" TargetType="Label">
+            <Style.Setters>
+                <Setter Property="FontSize" Value="80" />
+                <Setter Property="Foreground" Value="#FFA1F500" />
+            </Style.Setters>
+        </Style>
+
+        <Style x:Key="AudioControlsStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionDarkButton}">
+            <Style.Setters>
+                <Setter Property="Width" Value="40" />
+                <Setter Property="Height" Value="40" />
+                <Setter Property="Margin" Value="5" />
+            </Style.Setters>
+        </Style>
+
+        <Style TargetType="materialDesign:PackIcon">
+            <Style.Setters>
+                <Setter Property="Height" Value="30" />
+                <Setter Property="Width" Value="30" />
+            </Style.Setters>
+        </Style>
+
+        <Style x:Key="VolumeStyle" TargetType="materialDesign:PackIcon">
+            <Style.Setters>
+                <Setter Property="Height" Value="30" />
+                <Setter Property="Width" Value="30" />
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Foreground" Value="#FF83AF00" />
+            </Style.Setters>
+        </Style>
+
+        <Style TargetType="DataGrid">
+            <Style.Setters>
+                <Setter Property="Background" Value="#FF070900" />
+                <Setter Property="Foreground" Value="#FFABE046" />
+                <Setter Property="Margin" Value="0" />
+            </Style.Setters>
+        </Style>
+
+        <materialDesign:PackIcon x:Key="ShuffleIcon" x:Shared="False" Kind="Shuffle" Width="24" Height="24" FlowDirection="LeftToRight" />
+        <SolidColorBrush x:Key="MaterialDesignSelection" Color="#FF465627" />
+        <SolidColorBrush x:Key="MaterialDesignDataGridRowHoverBackground" Color="#FF465627"/>
+    </Window.Resources>
+
+    <Grid Margin="5" Background="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center">
+            <Label
+                HorizontalAlignment="Center"
+                Style="{StaticResource TitleStyle}"
+                Content="{Binding Player.Playlist.CurrentSong.DisplayName}" />
+
+            <Label 
+                HorizontalAlignment="Center" 
+                Style="{StaticResource TimeStyle}"
+                Content="{Binding Player.TimeLeft}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <Slider 
+                Minimum="0" 
+                Maximum="{Binding Player.Playlist.CurrentSong.Length}" 
+                Value="{Binding Player.Position,UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+
+        <StackPanel 
+            Grid.Row="2" 
+            Orientation="Horizontal"
+            HorizontalAlignment="Center">
+            <Button 
+                Style="{StaticResource AudioControlsStyle}"
+                Command="{Binding RewindCommand}">
+                <materialDesign:PackIcon Kind="Rewind" />
+            </Button>
+            
+            <Button 
+                Style="{StaticResource AudioControlsStyle}"
+                Command="{Binding PlayCommand}">
+                <materialDesign:PackIcon Kind="Play" />
+            </Button>
+
+            <Button 
+                Style="{StaticResource AudioControlsStyle}"
+                Command="{Binding PauseCommand}">
+                <materialDesign:PackIcon Kind="Pause" />
+            </Button>
+
+            <Button
+                Style="{StaticResource AudioControlsStyle}"
+                Command="{Binding StopCommand}">
+                <materialDesign:PackIcon Kind="Stop" />
+            </Button>
+
+            <Button 
+                Style="{StaticResource AudioControlsStyle}" 
+                Command="{Binding NextCommand}">
+                <materialDesign:PackIcon Kind="SkipNext" />
+            </Button>
+
+        </StackPanel>
+
+        <Grid Grid.Row="3" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <materialDesign:PackIcon 
+                Style="{StaticResource VolumeStyle}"
+                Grid.Column="0"
+                Kind="VolumeHigh" />
+            
+            <Slider 
+                Grid.Column="1"
+                VerticalAlignment="Center" 
+                Minimum="0"  
+                Maximum="100" 
+                TickFrequency="10" 
+                Value="{Binding Player.AudioController.Volume}" />
+        </Grid>
+
+        <DockPanel Grid.Row="4" LastChildFill="False">
+            <CheckBox
+                DockPanel.Dock="Left"
+                Style="{StaticResource MaterialDesignActionDarkCheckBox}"
+                materialDesign:ToggleButtonAssist.OnContent="{StaticResource ShuffleIcon}"
+                IsChecked="{Binding Player.Playlist.IsShuffle}">
+                <materialDesign:PackIcon Kind="ShuffleDisabled" />
+            </CheckBox>
+
+            <Button 
+                DockPanel.Dock="Right"
+                Style="{StaticResource AudioControlsStyle}"
+                Command="{Binding RemoveCommand}">
+                <materialDesign:PackIcon Kind="Minus" />
+            </Button>
+
+            <Button 
+                DockPanel.Dock="Right"
+                Style="{StaticResource AudioControlsStyle}"
+                Command="{Binding AddCommand}">
+                <materialDesign:PackIcon Kind="Plus" />
+            </Button>
+
+        </DockPanel>
+
+        <DataGrid 
+                Grid.Row="5" 
+            VerticalScrollBarVisibility="Hidden"
+                ItemsSource="{Binding Player.Playlist.AudioFiles}" 
+                SelectedItem="{Binding Player.Playlist.SelectedSong,UpdateSourceTrigger=PropertyChanged}" 
+                AutoGenerateColumns="False" 
+                IsReadOnly="True" >
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="2.8*" Binding="{Binding Path=DisplayName}"  />
+                <DataGridTextColumn Width="*" Binding="{Binding Path=TotalTime,StringFormat={}{0:hh\\:mm\\:ss}}" />
+            </DataGrid.Columns>
+            
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="PreviewMouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding PlayCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+        </DataGrid>
+    </Grid>
+</Window>
